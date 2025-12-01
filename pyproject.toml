@@ -1,0 +1,14 @@
+[project]
+name = "imove-bids-handson"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ipykernel>=7.1.0",
+    "mne>=1.11.0",
+    "mne-bids>=0.17.0",
+    "mnelab>=1.0.8",
+    "pandas>=2.3.3",
+    "pyxdf>=1.17.0",
+]
