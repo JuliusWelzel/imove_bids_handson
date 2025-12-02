@@ -12,7 +12,7 @@ dir_source = dir_project.joinpath(r'data\source')
 dir_root_bids =  dir_project.joinpath(r'data\bids')
 
 # set bids info
-task = 'SpotRotation'
+TASK = 'EvenTerrainWalking'
 
 # check for directories in source data
 files_xdf = dir_source.glob('*.xdf')
@@ -23,7 +23,7 @@ for file_xdf in files_xdf:
 
     # get info for BIDS
     # id from file name, might be different for your data
-    sub_id = file_xdf.stem.split('_')[1]
+    sub_id = file_xdf.stem.split('_')[0]
 
     # find eeg stream in .xdf file
     streams, _ = load_xdf(file_xdf)
@@ -35,29 +35,29 @@ for file_xdf in files_xdf:
     
     # load to mne
     raw = read_raw_xdf(file_xdf, stream_ids=[eeg_stream_id], verbose=False)  # stream id has to be a list
+    
+    # add BIDS relevant info (https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electroencephalography.html#sidecar-json-_eegjson)
     raw.info['line_freq'] = 50  # specify power line frequency as required by BIDS (European line frequency here)
     
     # delete events if they start before eeg recording
     events = mne.events_from_annotations(raw)
 
     # specify BIDS path and write
-    bids_path = BIDSPath(subject=sub_id, task=task, datatype='eeg', root=dir_root_bids)
-    write_raw_bids(raw, bids_path, events=None, overwrite=True, allow_preload=True, format='BrainVision', verbose=True)
+    bids_path = BIDSPath(subject=sub_id, task=TASK, datatype='eeg', root=dir_root_bids)
+    write_raw_bids(raw, bids_path, events=None, overwrite=True, allow_preload=True, format='EDF', verbose=True)
 
-    print(f'Finished writing BIDS for participant {sub_id} and task {task}')
-
+    print(f'Finished writing BIDS for participant {sub_id} and task {TASK}')
 
 # make dataset description
 make_dataset_description(
     path=bids_path.root,
     name="Computer vision based gait tracking and mobile EEG",
-    authors=["Klapproth, M.", "Paape, S.", "Debener, S.", "Welzel, J."],
+    authors=["Lara Papin",  "Welzel, J.", "Debener, S."],
     acknowledgements="n/a",
     data_license="n/a",
     funding=[""],
     references_and_links=[
-        "Human cortical dynamics during gait",
+        "Dual-task interference during gait in young and older adults",
     ],
-    doi="doi:https://doi.org/10.1038/s41598-021-97749-8",
     overwrite=True,
 )

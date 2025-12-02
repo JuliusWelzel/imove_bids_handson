@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 # get dir of this script
-dir_project = Path(__file__).parent
+dir_project = Path(__file__).parent.parent
 
 # set paths
 dir_source = dir_project.joinpath(r'data\sourcedata')
@@ -15,9 +15,9 @@ dir_root_bids =  dir_project.joinpath(r'data\bids')
 
 # Sample participant data
 data = {
-    'participant_id': ['sub-1', 'sub-2'], # required column
-    'age': [25, 30],
-    'group': ['control', 'patient']
+    'participant_id': ['sub-VP014', 'sub-VP015'], # required column
+    'age': [24, 70],
+    'group': ['HYA', 'HOA']
 }
 
 # Create a DataFrame from the data
@@ -34,13 +34,13 @@ df.to_csv(dir_root_bids.joinpath('participants.tsv'), sep='\t', index=False)
 df = pd.read_csv(dir_root_bids.joinpath('participants.tsv'), sep='\t')
 
 # Edit the participant data, where id is 'sub-1'
-df.loc[df['participant_id'] == 'sub-1', 'age'] = 26
+df.loc[df['participant_id'] == 'sub-VP014', 'age'] = 64
 
 # assign the group 'control' to all participants
-df['group'] = 'control'
+df['group'] = 'HOA'
 
-# remove height and weight column
-df = df.drop(columns=['height', 'weight'])
+# remove columns which MNE-BIDS automatically generated
+# df = df.drop(columns=['height', 'weight'])
 
 ####
 # Provide descriptions of the columns in the participants.tsv file
@@ -58,8 +58,8 @@ json_description = {
     "group": {
         "Description": "Group to which the participant belongs",
         "Levels": {
-            "control": "Control participant without medication",
-            "patient": "Patient participant receiving medication"
+            "HYA": "Healthy Young Adults",
+            "HOA": "Healthy Older Adults"
         }
     }
 }
