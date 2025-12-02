@@ -51,13 +51,10 @@ for file_xdf in files_xdf:
 # make dataset description
 make_dataset_description(
     path=bids_path.root,
-    name="Computer vision based gait tracking and mobile EEG",
+    name="Dual-task interference during gait in young and older adults",
     authors=["Lara Papin",  "Welzel, J.", "Debener, S."],
     acknowledgements="n/a",
     data_license="n/a",
     funding=[""],
-    references_and_links=[
-        "Dual-task interference during gait in young and older adults",
-    ],
     overwrite=True,
 )
