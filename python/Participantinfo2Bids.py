@@ -7,7 +7,7 @@ dir_project = Path(__file__).parent.parent
 
 # set paths
 dir_source = dir_project.joinpath(r'data\sourcedata')
-dir_root_bids =  dir_project.joinpath(r'data\bids')
+dir_root_bids =  dir_project.joinpath(r'data\bids_mne')
 
 ####
 # Create new participant.tsv
