@@ -3,6 +3,8 @@ import mne
 from mne_bids import write_raw_bids, BIDSPath, make_dataset_description
 from pathlib import Path
 from pyxdf import load_xdf
+from datetime import datetime, timezone
+import random
 
 # get dir of this script
 dir_project = Path(__file__).parent.parent
@@ -38,7 +40,20 @@ for file_xdf in files_xdf:
     
     # add BIDS relevant info (https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electroencephalography.html#sidecar-json-_eegjson)
     raw.info['line_freq'] = 50  # specify power line frequency as required by BIDS (European line frequency here)
+    # Generate random date and time with subsecond precision
+    random_timestamp = datetime(
+        year=random.randint(2020, 2024),
+        month=random.randint(1, 12),
+        day=random.randint(1, 28),
+        hour=random.randint(0, 23),
+        minute=random.randint(0, 59),
+        second=random.randint(0, 59),
+        microsecond=random.randint(0, 999999),
+        tzinfo=timezone.utc
+    )
     
+    raw.set_meas_date(random_timestamp)
+
     # delete events if they start before eeg recording
     events, events_id  = mne.events_from_annotations(raw)
     # remove events that start before 0s

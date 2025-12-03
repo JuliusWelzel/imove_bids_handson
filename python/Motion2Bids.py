@@ -42,8 +42,8 @@ for file_xdf in files_xdf:
     # get motion streams 
     # Name of sensor on left foot: 'Movella DOT B5'
     # Name of sensor on right foot: 'Movella DOT B2'
-    motion_lf = [s for s in streams if s['info']['name'][0] == 'Movella DOT B5'][0]
-    motion_rf = [s for s in streams if s['info']['name'][0] == 'Movella DOT B2'][0]
+    motion_lf = [s for s in streams if s['info']['name'][0] == 'Movella DOT B1'][0]
+    motion_rf = [s for s in streams if s['info']['name'][0] == 'Movella DOT B3'][0]
     
     # get time difference between streams
     time_start_lf = motion_lf['time_stamps'][0]
@@ -130,3 +130,16 @@ for file_xdf in files_xdf:
     # update path for channels.tsv
     channels_tsv_file = subj_bidsmotion_path.joinpath(f"sub-{sub_id}_task-{TASK}_tracksys-{TRACKSYS}_channels.tsv")
     channels_data_tsv.to_csv(channels_tsv_file, sep='\t', index=False)
+
+    # read in the scans.tsv and add the same date plus the time difference between the streams
+    scans_tsv_file = Path(bids_path.root).joinpath(f"sub-{sub_id}", f"sub-{sub_id}_scans.tsv")
+    scans_data_tsv = pd.read_csv(scans_tsv_file, sep='\t')
+    eeg_acq_time = pd.to_datetime(scans_data_tsv.loc[scans_data_tsv['filename'].str.contains('eeg'), 'acq_time'].values[0])
+    # Add new row for motion data
+    new_row = pd.DataFrame({
+        'filename': [f"motion/sub-{sub_id}_task-{TASK}_tracksys-{TRACKSYS}_motion.tsv"],
+        'acq_time': [(eeg_acq_time + pd.to_timedelta((time_start_rf + time_start_lf)/2000, unit='s')).strftime('%Y-%m-%dT%H:%M:%S.%f')]
+    })
+    scans_data_tsv = pd.concat([scans_data_tsv, new_row], ignore_index=True)
+    # save updated scans.tsv
+    scans_data_tsv.to_csv(scans_tsv_file, sep='\t', index=False)
