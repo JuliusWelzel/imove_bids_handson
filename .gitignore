@@ -12,5 +12,7 @@ wheels/
 uv.lock
 
 data/bids/
+data/bids_mne/
+data/bids_fieldtrip/
 
 data/source
