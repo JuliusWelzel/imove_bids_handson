@@ -1,9 +1,11 @@
 % configure paths 
-fieldTripPath   = 'P:\Sein_Jeung\Project_BIDS\Workshops\Workshop_2024_NEC\public\Tools\fieldtrip-20240515'; 
-xdfFileName     = 'P:\Sein_Jeung\Project_BIDS\Workshops\Workshop_2024_NEC\public\data\sourcedata\1\control_body.xdf';
-bidsFolder      = 'P:\Sein_Jeung\Project_BIDS\Workshops\Workshop_2024_NEC\public\data\bidsdata';
+fieldTripPath   = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson'; 
+xdfFileName     = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\data\source\VP037.xdf';
+bidsFolder      = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\data\bids_fieldtrip';
+matlabFolder    = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\matlab';
 
 % add fieldtrip 
+addpath(matlabFolder);
 addpath(fieldTripPath)
 ft_defaults
 [filepath,~,~] = fileparts(which('ft_defaults'));
@@ -18,13 +20,13 @@ streams                         = load_xdf(xdfFileName);
 % indices are better found this way because stream order may differ between
 % recordings 
 
-EEGStreamName           = 'BrainVision RDA'; 
+EEGStreamName           = 'Android_EEG - PRO_009'; 
 EEGStreamInd            = find(strcmp(streamNames, EEGStreamName)); 
 
-EventStreamName         = 'ExperimentMarkerStream'; 
+EventStreamName         = 'UDP_Markers - PRO_009'; 
 EventStreamInd          = find(strcmp(streamNames, EventStreamName)); 
 
-MotionStreamName        = 'headRigid';
+MotionStreamName        = 'Movella DOT B3';
 MotionStreamInd         = find(strcmp(streamNames, MotionStreamName)); 
 
 % 2. convert streams to fieldtrip data structs  
