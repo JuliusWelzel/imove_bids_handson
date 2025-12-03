@@ -1,8 +1,8 @@
 % configure paths 
-fieldTripPath   = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson'; 
+fieldTripPath   = 'C:\Users\juliu\Documents\MATLAB\fieldtrip-20251201'; 
+matlabFolder    = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\matlab';
 xdfFileName     = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\data\source\VP037.xdf';
 bidsFolder      = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\data\bids_fieldtrip';
-matlabFolder    = 'C:\Users\juliu\Nextcloud\Talks\imove_bids_handson\matlab';
 
 % add fieldtrip 
 addpath(matlabFolder);
@@ -31,8 +31,18 @@ MotionStreamInd         = find(strcmp(streamNames, MotionStreamName));
 
 % 2. convert streams to fieldtrip data structs  
 %--------------------------------------------------------------------------
-EEGftData           = stream_to_ft(streams{EEGStreamInd}); 
+EEGftData           = stream_to_ft(streams{EEGStreamInd});
+cfg = [];
+cfg.channel = 'all';
+EEGftData = ft_selectdata(cfg, EEGftData);
+% Remove channels containing Acc, Gyro, or Quad
+channelsToKeep = ~contains(EEGftData.label, {'Acc', 'Gyro', 'Quat'});
+cfg = [];
+cfg.channel = EEGftData.label(channelsToKeep);
+EEGftData = ft_selectdata(cfg, EEGftData);
+
 MotionftData        = stream_to_ft(streams{MotionStreamInd}); 
+MotionftData.trial{1} = MotionftData.trial{1}(1:end-1,:);
 
 % 3. Save time synch information
 %--------------------------------------------------------------------------
@@ -54,34 +64,22 @@ motionAcqTime   = datestr(motionAcqNum,'yyyy-mm-ddTHH:MM:SS.FFF');
 %--------------------------------------------------------------------------
 cfg                                         = [];
 cfg.bidsroot                                = bidsFolder;
-cfg.sub                                     = '001';
-cfg.task                                    = 'SpotRotation';
+cfg.sub                                     = 'VP037';
+cfg.task                                    = 'EvenTerrainWalking';
 cfg.scans.acq_time                          = datetime('now');
-cfg.dataset_description.Name                = 'Example spot rotation data';
-cfg.motion.TaskName                         = 'Rotation';
-cfg.datatype                                = 'motion';
-cfg.InstitutionName                         = 'Technische Universitaet zu Berlin';
-cfg.InstitutionalDepartmentName             = 'Biological Psychology and Neuroergonomics';
-cfg.InstitutionAddress                      = 'Strasse des 17. Juni 135, 10623, Berlin, Germany';
-cfg.TaskDescription                         = 'Participants equipped with VR HMD rotated either physically or using a joystick.';
- 
+
 % required for dataset_description.json
-cfg.dataset_description.Name                = 'EEG and motion capture data set for a full-body/joystick rotation task';
-cfg.dataset_description.BIDSVersion         = 'unofficial extension';
+cfg.dataset_description.Name                = 'Dual-task interference during gait in young and older adults';
+cfg.dataset_description.BIDSVersion         = '1.9';
 
 % optional for dataset_description.json
-cfg.dataset_description.License             = 'CC0';
-cfg.dataset_description.Authors             = {"Gramann, K.", "Hohlefeld, F.U.", "Gehrke, L.", "Klug, M"};
-cfg.dataset_description.Acknowledgements    = 'n/a';
-cfg.dataset_description.Funding             = {""};
-cfg.dataset_description.ReferencesAndLinks  = {"Human cortical dynamics during full-body heading changes"};
-cfg.dataset_description.DatasetDOI          = 'https://doi.org/10.1038/s41598-021-97749-8';
+cfg.dataset_description.Authors             = {"Lara Papin",  "Welzel, J.", "Debener, S."};
+
 
 % 5. enter eeg metadata and feed to data2bids function
 %--------------------------------------------------------------------------
 cfg.datatype = 'eeg';
-cfg.eeg.Manufacturer                = 'BrainProducts';
-cfg.eeg.ManufacturersModelName      = 'n/a';
+cfg.eeg.Manufacturer                = 'mbt';
 cfg.eeg.PowerLineFrequency          = 50; 
 cfg.eeg.EEGReference                = 'REF'; 
 cfg.eeg.SoftwareFilters             = 'n/a'; 
@@ -93,69 +91,55 @@ data2bids(cfg, EEGftData);
 
 % 6. enter motion metadata and feed to dat2bids functino
 %--------------------------------------------------------------------------
-cfg.datatype    = 'motion'; 
-cfg             = rmfield(cfg, 'eeg'); 
+cfg                             = rmfield(cfg, 'eeg'); 
+cfg.datatype                    = 'motion'; 
+cfg.tracksys                    = 'IMU';
+cfg.motion.TrackingSystemName   = 'Movella';
 
-cfg.tracksys = 'HTCVive';
-
-cfg.motion.TrackingSystemName          = 'HTCVive';
-cfg.motion.DeviceSerialNumber          = 'n/a';
-cfg.motion.SoftwareVersions            = 'n/a';
-cfg.motion.Manufacturer                = 'HTC';
-cfg.motion.ManufacturersModelName      = 'Vive Pro';
 
 % specify channel details, this overrides the details in the original data structure
 cfg.channels = [];
 cfg.channels.name = {
-  'HTCVive_posX'
-  'HTCVive_posY'
-  'HTCVive_posZ'
-  'HTCVive_quatX' 
-  'HTCVive_quatY'
-  'HTCVive_quatZ'
-  'HTCVive_quatW'
-  'HTCVive_ori'
+  'LeftFoot_Accel_x'
+  'LeftFoot_Accel_y'
+  'LeftFoot_Accel_z'
+  'LeftFoot_Gyro_x'
+  'LeftFoot_Gyro_y'
+  'LeftFoot_Gyro_z'
   };
 cfg.channels.component= {
   'x'
   'y'
   'z'
-  'quat_x'
-  'quat_y'
-  'quat_z'
-  'quat_w'
-  'n/a'
+  'x'
+  'y'
+  'z'
   };
 cfg.channels.type = {
-  'POS'
-  'POS'
-  'POS'
-  'ORI'
-  'ORI'
-  'ORI'
-  'ORI'
-  'MISC'
+  'ACCEL'
+  'ACCEL'
+  'ACCEL'
+  'GYRO'
+  'GYRO'
+  'GYRO'
   };
 cfg.channels.units = {
-  'm'
-  'm'
-  'm'
-  'n/a'
-  'n/a'
-  'n/a'
-  'n/a'
-  'n/a'
+  'm/s^2'
+  'm/s^2'
+  'm/s^2'
+  'deg/s'
+  'deg/s'
+  'deg/s'
   };
 
+
 cfg.channels.tracked_point = {
-  'head'
-  'head'
-  'head'
-  'head'
-  'head'
-  'head'
-  'head'
-  'head'
+  'LeftFoot'
+  'LeftFoot'
+  'LeftFoot'
+  'LeftFoot'
+  'LeftFoot'
+  'LeftFoot'
   };
 
 % rename the channels in the data to match with channels.tsv
