@@ -40,11 +40,13 @@ for file_xdf in files_xdf:
     raw.info['line_freq'] = 50  # specify power line frequency as required by BIDS (European line frequency here)
     
     # delete events if they start before eeg recording
-    events = mne.events_from_annotations(raw)
+    events, events_id  = mne.events_from_annotations(raw)
+    # remove events that start before 0s
+    events = events[events[:, 0] >= 0]
 
     # specify BIDS path and write
     bids_path = BIDSPath(subject=sub_id, task=TASK, datatype='eeg', root=dir_root_bids)
-    write_raw_bids(raw, bids_path, events=None, overwrite=True, allow_preload=True, format='EDF', verbose=True)
+    write_raw_bids(raw, bids_path, events=events, event_id=events_id, overwrite=True, allow_preload=True, format='BrainVision', verbose=True)
 
     print(f'Finished writing BIDS for participant {sub_id} and task {TASK}')
 

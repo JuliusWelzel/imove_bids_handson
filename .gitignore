@@ -12,3 +12,5 @@ wheels/
 uv.lock
 
 data/bids/
+
+data/source

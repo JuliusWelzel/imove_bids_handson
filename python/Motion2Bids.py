@@ -1,7 +1,4 @@
-from ast import Name
-from mnelab.io.xdf import read_raw_xdf
-import mne
-from mne_bids import write_raw_bids, BIDSPath, make_dataset_description
+from mne_bids import BIDSPath
 import numpy as np
 import json
 import pandas as pd
