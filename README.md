@@ -4,7 +4,7 @@ This repository contains code for converting XDF files to BIDS format using Pyth
 
 ## Data
 
-Download the source data from: [DATA_LINK_PLACEHOLDER]
+Download the example data from [here.](https://cloud.uol.de/s/BsyDPptGmqsd5io)
 
 Place the XDF files in the `data/source/` directory.
 
